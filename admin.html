@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>MPNS অ্যাডমিন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;700;800&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1f;--cd:#121a33;--cd2:#18224a;--ln:#26325f;--tx:#e8ecff;--mu:#93a0cf;--cy:#22d3ee;--vi:#8b5cf6;--gr:#22c55e;--am:#fbbf24;--pk:#f472b6;--rd:#ef4444}
+*{box-sizing:border-box;margin:0}
+body{font-family:"Hind Siliguri",system-ui,sans-serif;background:radial-gradient(900px 500px at 85% -10%,#2a1f6b66,transparent),radial-gradient(700px 420px at -10% 10%,#0e7490553,transparent),var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+h1,h2,h3{font-family:"Anek Bangla",sans-serif}
+.top{position:sticky;top:0;z-index:20;background:#0a0f1fcc;backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.top-in{max-width:980px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
+.logo{font:800 20px "Anek Bangla";background:linear-gradient(90deg,var(--cy),var(--vi),var(--pk));-webkit-background-clip:text;background-clip:text;color:transparent;flex:1}
+.wrap{max-width:980px;margin:0 auto;padding:20px 18px 60px}
+input,button{font:inherit;font-size:16px;border-radius:12px;border:1px solid var(--ln);background:var(--cd);color:var(--tx);padding:11px 14px;width:100%}
+input:focus{outline:0;border-color:var(--cy);box-shadow:0 0 0 4px #22d3ee22}
+button{cursor:pointer;border:0;font-weight:600;transition:transform .15s,filter .2s;width:auto}
+button:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.b-p{background:linear-gradient(135deg,var(--cy),var(--vi));color:#fff;box-shadow:0 10px 24px -10px var(--vi)}
+.b-g{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;box-shadow:0 10px 24px -10px #22c55e}
+.b-r{background:linear-gradient(135deg,#f87171,#dc2626);color:#fff}
+.b-o{background:var(--cd2);color:var(--tx);border:1px solid var(--ln)}
+.gate{max-width:380px;margin:12vh auto 0;background:linear-gradient(160deg,var(--cd2),var(--cd));border:1px solid var(--ln);border-radius:24px;padding:28px;box-shadow:0 0 60px -12px #8b5cf655;text-align:center}
+.gate h2{font-size:1.6rem;margin-bottom:6px}.gate input{margin:14px 0 10px}
+.err{color:#fca5a5;min-height:22px;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.st{border-radius:18px;padding:16px;position:relative;overflow:hidden;border:1px solid #ffffff14;animation:in .5s both}
+.st:after{content:"";position:absolute;width:80px;height:80px;right:-20px;bottom:-30px;border-radius:50%;background:#ffffff1c}
+.st b{display:block;font:800 28px/1.25 "Anek Bangla"}.st span{font-size:14px;opacity:.9}.st i{position:absolute;right:12px;top:8px;font-style:normal;font-size:24px}
+.s1{background:linear-gradient(135deg,#0891b2,#22d3ee55);box-shadow:0 16px 30px -20px var(--cy)}
+.s2{background:linear-gradient(135deg,#7c3aed,#8b5cf655);box-shadow:0 16px 30px -20px var(--vi)}
+.s3{background:linear-gradient(135deg,#16a34a,#22c55e55);box-shadow:0 16px 30px -20px var(--gr)}
+.s4{background:linear-gradient(135deg,#d97706,#fbbf2455);box-shadow:0 16px 30px -20px var(--am)}
+.s5{background:linear-gradient(135deg,#db2777,#f472b655);box-shadow:0 16px 30px -20px var(--pk)}
+.s6{background:linear-gradient(135deg,#4f46e5,#22d3ee44);box-shadow:0 16px 30px -20px #4f46e5}
+@keyframes in{from{opacity:0;transform:translateY(12px)}}
+.tabs{display:flex;gap:8px;margin:6px 0 16px;overflow-x:auto}
+.tab{background:var(--cd);color:var(--mu);border:1px solid var(--ln);border-radius:99px;padding:9px 18px;white-space:nowrap}
+.tab.on{background:linear-gradient(135deg,var(--cy),var(--vi));color:#fff;border-color:transparent;box-shadow:0 10px 22px -10px var(--vi)}
+.badge{background:var(--am);color:#1b1300;border-radius:99px;padding:0 8px;font-size:13px;margin-left:6px;font-weight:700}
+.card{background:linear-gradient(160deg,var(--cd2),var(--cd));border:1px solid var(--ln);border-radius:18px;padding:16px;margin-bottom:12px;animation:in .4s both}
+.card.pend{border-color:#fbbf2488;box-shadow:0 0 28px -10px #fbbf24aa}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.mu{color:var(--mu);font-size:14px;word-break:break-all}
+.chip{display:inline-block;padding:2px 12px;border-radius:99px;font-size:13px;font-weight:600}
+.c-y{background:#fbbf2426;color:var(--am)}.c-g{background:#22c55e26;color:#4ade80}.c-r{background:#ef444426;color:#f87171}.c-v{background:#8b5cf630;color:#c4b5fd}.c-c{background:#22d3ee26;color:#67e8f9}
+.acts{display:flex;gap:8px;margin-top:12px}.acts button{flex:1}
+.trx{font:700 17px "Anek Bangla";color:var(--cy);letter-spacing:.03em}
+.empty{text-align:center;color:var(--mu);padding:30px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#22c55e;color:#04140a;padding:11px 20px;border-radius:12px;opacity:0;transition:.3s;font-weight:600;z-index:99}
+.toast.show{opacity:1;transform:translate(-50%,0)}.toast.e{background:var(--rd);color:#fff}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="gate" class="gate">
+  <div style="font-size:40px">🛠️</div><h2>MPNS অ্যাডমিন</h2><p class="mu">আপনার ADMIN_KEY দিয়ে ঢুকুন</p>
+  <input id="k" type="password" placeholder="ADMIN_KEY" autocomplete="current-password">
+  <div class="err" id="e"></div>
+  <button class="b-p" style="width:100%" onclick="go()">ঢুকুন</button>
+</div>
+<div id="app" style="display:none">
+  <div class="top"><div class="top-in"><div class="logo">🔔 MPNS অ্যাডমিন</div><button class="b-o" onclick="load()">🔄 রিফ্রেশ</button><button class="b-o" onclick="out()">বের হন</button></div></div>
+  <div class="wrap">
+    <div class="stats" id="stats"></div>
+    <div class="tabs"><button class="tab on" id="tp" onclick="tab('p')">💰 পেমেন্ট<span class="badge" id="pb" style="display:none"></span></button><button class="tab" id="tc" onclick="tab('c')">👥 গ্রাহক</button></div>
+    <div id="vp"></div>
+    <div id="vc" style="display:none"><input id="q" placeholder="🔍 ইমেইল দিয়ে খুঁজুন" oninput="drawC()" style="margin-bottom:12px"><div id="cl"></div></div>
+  </div>
+</div>
+<script>
+var K=sessionStorage.getItem("k")||"",P=[],C=[];
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function bn(n){return String(n).replace(/\d/g,function(d){return"০১২৩৪৫৬৭৮৯"[d]})}
+function toast(m,bad){var t=$("tt");if(!t){t=document.createElement("div");t.id="tt";document.body.appendChild(t)}t.className="toast show"+(bad?" e":"");t.textContent=m;clearTimeout(t._t);t._t=setTimeout(function(){t.className="toast"},3000)}
+async function api(p,m,b){var r=await fetch(p,{method:m||"GET",headers:{"Content-Type":"application/json","x-admin-key":K},body:b?JSON.stringify(b):undefined});var j=await r.json();if(!r.ok)throw new Error(j.error||"সমস্যা");return j}
+function out(){sessionStorage.removeItem("k");location.reload()}
+async function go(){K=$("k").value||K;try{await load();sessionStorage.setItem("k",K);$("gate").style.display="none";$("app").style.display="block"}catch(e){$("e").textContent=e.message}}
+function tab(t){$("vp").style.display=t==="p"?"block":"none";$("vc").style.display=t==="c"?"block":"none";$("tp").className="tab"+(t==="p"?" on":"");$("tc").className="tab"+(t==="c"?" on":"")}
+async function act(id,w){if(!confirm(w==="approve"?"অনুমোদন করবেন? আগে নগদে টাকা ও TrxID মিলিয়ে নিন।":"বাতিল করবেন?"))return;try{await api("/admin/payments/"+id+"/"+w,"POST");toast(w==="approve"?"✅ অনুমোদিত":"বাতিল হয়েছে");load()}catch(e){toast(e.message,true)}}
+async function grant(id){var d=prompt("কত দিন যোগ করবেন?","7");if(!d)return;try{await api("/admin/customers/"+id+"/grant","POST",{days:d});toast("✅ দিন যোগ হয়েছে");load()}catch(e){toast(e.message,true)}}
+function drawC(){
+  var q=($("q").value||"").toLowerCase(),now=Date.now();
+  var l=C.filter(function(x){return x.email.toLowerCase().indexOf(q)>-1});
+  $("cl").innerHTML=l.length?l.map(function(x){
+    var ex=x.plan_expires_at?new Date(x.plan_expires_at):null,live=ex&&ex>now;
+    return '<div class="card"><div class="row"><b style="word-break:break-all">'+esc(x.email)+'</b><span><span class="chip '+(x.plan==="trial"?"c-c":"c-v")+'">'+esc(x.plan==="trial"?"ট্রায়াল":x.plan)+'</span> <span class="chip '+(live?"c-g":"c-r")+'">'+(live?"চালু":"মেয়াদ শেষ")+'</span></span></div>'
+      +'<div class="mu" style="margin-top:6px">মেয়াদ: '+(ex?ex.toLocaleString("bn-BD"):"—")+' • ডিভাইস: '+bn(x.devices)+' • এই মাসে: '+bn(x.sent_count)+'</div>'
+      +'<div class="acts"><button class="b-p" onclick="grant('+x.id+')">➕ দিন যোগ করুন</button></div></div>';
+  }).join(""):'<div class="empty">কোনো গ্রাহক নেই</div>';
+}
+async function load(){
+  var r=await Promise.all([api("/admin/stats"),api("/admin/payments"),api("/admin/customers")]),s=r[0];P=r[1];C=r[2];
+  var T=[["s1","👥",s.customers,"মোট গ্রাহক"],["s3","💎",s.paid,"পেইড গ্রাহক"],["s2","🎁",s.trials,"ট্রায়ালে আছে"],["s4","⏳",s.pending,"পেন্ডিং পেমেন্ট"],["s5","💰","৳"+bn(s.revenue),"মোট আয়"],["s6","📱",s.devices,"মোট ডিভাইস"]];
+  $("stats").innerHTML=T.map(function(t,i){return '<div class="st '+t[0]+'" style="animation-delay:'+i*60+'ms"><i>'+t[1]+'</i><b>'+(typeof t[2]==="number"?bn(t[2]):t[2])+'</b><span>'+t[3]+'</span></div>'}).join("");
+  var pb=$("pb");pb.style.display=s.pending?"inline":"none";pb.textContent=bn(s.pending);
+  var SL={pending:["c-y","⏳ অপেক্ষায়"],approved:["c-g","✅ অনুমোদিত"],rejected:["c-r","❌ বাতিল"]};
+  $("vp").innerHTML=P.length?P.map(function(x){var s=SL[x.status]||["c-v",x.status];
+    return '<div class="card'+(x.status==="pending"?" pend":"")+'"><div class="row"><b style="word-break:break-all">'+esc(x.email)+'</b><span class="chip '+s[0]+'">'+s[1]+'</span></div>'
+    +'<div class="row" style="margin-top:8px"><span class="trx">'+esc(x.trx_id)+'</span><b style="font:800 22px Anek Bangla">৳'+bn(x.amount)+'</b></div>'
+    +'<div class="mu">প্ল্যান: '+esc(x.plan_id)+' • নগদ: '+esc(x.sender)+' • '+new Date(x.created_at).toLocaleString("bn-BD")+'</div>'
+    +(x.status==="pending"?'<div class="acts"><button class="b-g" onclick="act('+x.id+',\'approve\')">✅ অনুমোদন</button><button class="b-r" onclick="act('+x.id+',\'reject\')">❌ বাতিল</button></div>':"")+'</div>'}).join(""):'<div class="empty">কোনো পেমেন্ট নেই</div>';
+  drawC();
+}
+$("k").onkeydown=function(e){if(e.key==="Enter")go()};
+if(K){go()}
+</script></body></html>

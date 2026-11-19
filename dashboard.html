@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b6b5c">
+<title>ড্যাশবোর্ড — MPNS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;700;800&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head><body class="app">
+<div id="top"></div>
+<main class="ap-main">
+  <div id="hero"></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="card"><h3>নতুন অ্যাপ বানান</h3><p class="m sm">প্রতিটা ওয়েবসাইটের জন্য একটা অ্যাপ।</p>
+    <div class="fld"><input id="appname" placeholder="যেমন: আমার অনলাইন শপ" maxlength="60"></div>
+    <button class="btn" onclick="createApp()">অ্যাপ তৈরি করুন</button></div>
+  <div id="apps"></div>
+</main>
+<div id="bar"></div>
+<script src="/common.js"></script>
+<script>
+var APPS = {}, CFG = {};
+function left(ms) { var d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5); return bn(d) + " দিন " + bn(h) + " ঘণ্টা"; }
+function renderTop(me, apps) {
+  var ms = me.expires ? new Date(me.expires) - Date.now() : 0, ok = ms > 0;
+  var pl = (CFG.plans || []).find(function (x) { return x.id === me.plan; });
+  var total = (me.plan === "trial" ? ((CFG.trial && CFG.trial.days) || 2) : pl ? pl.days : 30) * 864e5;
+  var p = ok ? Math.max(5, Math.min(100, Math.round(100 * ms / total))) : 0;
+  var dev = apps.reduce(function (a, x) { return a + x.devices; }, 0), rem = Math.max(0, me.limit - me.sent), pct = Math.min(100, 100 * me.sent / me.limit);
+  var days = Math.ceil(ms / 864e5);
+  $("hero").innerHTML = '<div class="hero-d"><div style="display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap;position:relative;z-index:1">' +
+    '<div style="flex:1;min-width:210px"><div class="sm" style="opacity:.9">স্বাগতম 👋</div><h1>' + esc(me.email) + '</h1>' +
+    '<span class="chip' + (ok ? "" : " bad") + '">' + (ok ? "✅ " + esc(me.planName) + " চালু" : "⛔ " + esc(me.planName) + " — মেয়াদ শেষ") + '</span>' +
+    '<p class="sm" style="margin:10px 0 0;opacity:.95">' + (ok ? "আর " + left(ms) + " বাকি" : "নোটিফিকেশন পাঠাতে প্ল্যান নিন") + '</p>' +
+    '<a class="btn amber s" href="/billing" style="margin-top:12px">' + (ok ? "প্ল্যান বাড়ান" : "প্ল্যান নিন") + '</a></div>' +
+    '<div class="ring" style="--p:' + p + '"><i><span><b>' + bn(ok ? days : 0) + '</b>দিন বাকি</span></i></div></div></div>';
+  $("tiles").innerHTML =
+    '<div class="tile t1"><span class="ico">📱</span><b>' + bn(dev) + '</b><span>মোট ডিভাইস</span></div>' +
+    '<div class="tile t2"><span class="ico">🔔</span><b>' + bn(me.sent) + '</b><span>এই মাসে পাঠানো</span><div class="bar"><i style="width:' + pct + '%"></i></div></div>' +
+    '<div class="tile t3"><span class="ico">🎯</span><b>' + bn(rem) + '</b><span>বাকি লিমিট</span></div>' +
+    '<div class="tile t4"><span class="ico">🗂️</span><b>' + bn(apps.length) + '</b><span>অ্যাপ</span></div>';
+}
+async function load() {
+  try {
+    var r = await Promise.all([api("/api/me"), api("/api/apps")]);
+    renderTop(r[0], r[1]); renderApps(r[1]);
+  } catch (e) { toast(e.message, true); }
+}
+async function refreshTop() { try { var r = await Promise.all([api("/api/me"), api("/api/apps")]); renderTop(r[0], r[1]); } catch (e) {} }
+async function createApp() {
+  var n = $("appname").value.trim(); if (!n) return toast("অ্যাপের নাম লিখুন", true);
+  try { await api("/api/apps", "POST", { name: n }); $("appname").value = ""; toast("অ্যাপ তৈরি হয়েছে ✅"); load(); } catch (e) { toast(e.message, true); }
+}
+async function delApp(id) {
+  if (!confirm("এই অ্যাপ ও এর সব ডিভাইস মুছে যাবে। নিশ্চিত?")) return;
+  try { await api("/api/apps/" + id, "DELETE"); toast("মুছে ফেলা হয়েছে"); load(); } catch (e) { toast(e.message, true); }
+}
+function preview(id) {
+  var t = $("t" + id).value || "টাইটেল", b = $("b" + id).value || "আপনার মেসেজ এখানে দেখাবে", im = $("im" + id).value.trim();
+  var box = $("pv" + id); box.innerHTML = '<div class="notif"><div class="top"><span class="ic"></span>আপনার সাইট • এখন</div><b></b><div class="bd"></div></div>';
+  box.querySelector("b").textContent = t; box.querySelector(".bd").textContent = b;
+  if (im) { var i = document.createElement("img"); i.src = im; i.style.cssText = "width:100%;max-height:150px;object-fit:cover;border-radius:10px;margin-top:8px"; i.onerror = function () { i.remove(); }; box.firstChild.appendChild(i); }
+}
+async function send(id) {
+  var a = APPS[id], body = { title: $("t" + id).value.trim(), body: $("b" + id).value.trim(), url: $("u" + id).value.trim(), image: $("im" + id).value.trim(), icon: $("ic" + id).value.trim() };
+  if (!body.title || !body.body) return toast("টাইটেল ও মেসেজ লিখুন", true);
+  var btn = $("sb" + id); btn.disabled = true; btn.textContent = "পাঠানো হচ্ছে...";
+  try {
+    var r = await fetch("/v1/send", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + a.api_key }, body: JSON.stringify(body) });
+    var j = await r.json();
+    if (!r.ok) throw new Error(j.error);
+    toast("✅ " + bn(j.sent) + " জনকে পাঠানো হয়েছে" + (j.failed ? " (ব্যর্থ " + bn(j.failed) + ")" : ""));
+    ["t", "b", "u", "im", "ic"].forEach(function (k) { $(k + id).value = ""; }); preview(id); hist(id); refreshTop();
+  } catch (e) { toast(e.message, true); }
+  btn.disabled = false; btn.textContent = "নোটিফিকেশন পাঠান";
+}
+async function hist(id) {
+  try {
+    var h = await api("/api/apps/" + id + "/history");
+    $("h" + id).innerHTML = h.length ? h.map(function (n) {
+      var rate = n.sent ? Math.round(100 * n.clicks / n.sent) : 0;
+      return '<div class="hist"><b>' + esc(n.title) + '</b><div class="m sm">' + esc(n.body) + '</div><span class="tag g">পাঠানো ' + bn(n.sent) + '</span><span class="tag y">ক্লিক ' + bn(n.clicks) + ' (' + bn(rate) + '%)</span>' +
+        (n.failed ? '<span class="tag r">ব্যর্থ ' + bn(n.failed) + '</span>' : '') + (n.image ? '<span class="tag">ছবি</span>' : '') + (n.url ? '<span class="tag">লিংক</span>' : '') +
+        '<span class="tag">' + new Date(n.created_at).toLocaleString("bn-BD") + '</span></div>';
+    }).join("") : '<div class="empty">এখনও কিছু পাঠানো হয়নি</div>';
+  } catch (e) {}
+}
+function renderApps(apps) {
+  APPS = {}; apps.forEach(function (a) { APPS[a.id] = a; });
+  if (!apps.length) { $("apps").innerHTML = '<div class="card empty"><b>প্রথম অ্যাপটা বানিয়ে ফেলুন</b><br>উপরে নাম লিখে "অ্যাপ তৈরি করুন" চাপুন।</div>'; return; }
+  var O = location.origin;
+  $("apps").innerHTML = apps.map(function (a) {
+    var i = a.id;
+    var sn = '<script src="' + O + '/sdk.js" data-app-id="' + i + '"><\/script>\n<button onclick="PushSaaS.subscribe()">নোটিফিকেশন চালু করুন</button>';
+    var sw = 'importScripts("' + O + '/sw-core.js");';
+    var ap = 'curl -X POST ' + O + '/v1/send \\\n  -H "Authorization: Bearer ' + a.api_key + '" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"title":"অফার!","body":"আজ ২০% ছাড়","url":"https://site.com","image":"https://site.com/a.jpg"}\'';
+    return '<div class="card fx ac"><div class="app-h"><div style="display:flex;gap:12px;align-items:center"><span class="av">' + esc(a.name.charAt(0).toUpperCase()) + '</span><h3>' + esc(a.name) + '</h3></div><span class="tag g">📱 ' + bn(a.devices) + ' ডিভাইস</span></div>' +
+      '<div class="m sm">App ID: ' + esc(i) + '</div>' +
+      '<div class="cmp"><h4>✉️ নোটিফিকেশন পাঠান</h4>' +
+      '<div class="fld"><input id="t' + i + '" placeholder="টাইটেল" maxlength="100" oninput="preview(\'' + i + '\')"></div>' +
+      '<div class="fld"><textarea id="b' + i + '" rows="2" placeholder="মেসেজ" maxlength="300" oninput="preview(\'' + i + '\')"></textarea></div>' +
+      '<div class="fld"><input id="u' + i + '" placeholder="ক্লিকের লিংক (ঐচ্ছিক) — না দিলে আপনার ওয়েবসাইট খুলবে"></div>' +
+      '<div class="row2"><div class="fld"><input id="im' + i + '" placeholder="ছবির URL (ঐচ্ছিক)" oninput="preview(\'' + i + '\')"></div><div class="fld"><input id="ic' + i + '" placeholder="আইকনের URL (ঐচ্ছিক)"></div></div>' +
+      (CFG.imageHost ? '<a class="sm" style="color:var(--pine)" href="' + esc(CFG.imageHost) + '" target="_blank" rel="noopener">ছবির URL বানাতে এখানে ট্যাপ করুন ↗</a>' : '') +
+      '<div class="pv" id="pv' + i + '"></div>' +
+      '<button class="btn block" id="sb' + i + '" onclick="send(\'' + i + '\')">নোটিফিকেশন পাঠান</button></div>' +
+      '<details class="acc"><summary>📊 পাঠানোর ইতিহাস ও ক্লিক</summary><div id="h' + i + '">লোড হচ্ছে...</div></details>' +
+      '<details class="acc"><summary>🧩 ওয়েবসাইটে বসানোর কোড</summary><div><p class="m sm">১) পেজে বসান:</p><div class="cw"><pre class="code" id="c1' + i + '">' + esc(sn) + '</pre><button class="copy" data-copy="c1' + i + '">কপি</button></div>' +
+      '<p class="m sm" style="margin-top:10px">২) সাইটের রুটে pushsaas-sw.js ফাইলে:</p><div class="cw"><pre class="code" id="c2' + i + '">' + esc(sw) + '</pre><button class="copy" data-copy="c2' + i + '">কপি</button></div></div></details>' +
+      '<details class="acc"><summary>🔑 API Key (নিজের সার্ভার থেকে পাঠাতে)</summary><div><p class="m sm">গোপন রাখুন, ফ্রন্টএন্ডে বসাবেন না:</p><div class="cw"><pre class="code" id="c3' + i + '">' + esc(ap) + '</pre><button class="copy" data-copy="c3' + i + '">কপি</button></div></div></details>' +
+      '<div style="margin-top:14px"><button class="btn danger s" onclick="delApp(\'' + i + '\')">অ্যাপ মুছুন</button></div></div>';
+  }).join("");
+  apps.forEach(function (a) { preview(a.id); hist(a.id); });
+}
+if (appShell("dash")) CFG_P.then(function (c) { CFG = c; load(); });
+</script></body></html>
